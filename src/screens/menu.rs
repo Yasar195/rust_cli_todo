@@ -19,7 +19,6 @@ impl MenuScreen {
             state: ratatui::widgets::ListState::default(),
             options: vec![
                 "View Tasks".to_string(),
-                "Add Task".to_string(),
                 "Settings".to_string(),
                 "Exit".to_string(),
             ],
@@ -47,7 +46,7 @@ impl Screen for MenuScreen {
             KeyCode::Enter => {
                 let selected = self.list.state.selected().unwrap_or(0);
                 match self.list.options[selected].as_str() {
-                    "View Tasks" | "Add Task" => Some(ScreenAction::Switch(Box::new(TasksScreen::new()))),
+                    "View Tasks" => Some(ScreenAction::Switch(Box::new(TasksScreen::new()))),
                     "Settings" => Some(ScreenAction::Switch(Box::new(SettingsScreen::new()))),
                     "Exit" => Some(ScreenAction::Exit),
                     _ => None,
