@@ -171,7 +171,6 @@ impl Screen for TasksScreen {
                 }
                 _ => None,
             },
-
             // ── Confirm delete mode ───────────────────────────────────
             TasksMode::ConfirmDelete => match key.code {
                 KeyCode::Enter => {
@@ -181,7 +180,7 @@ impl Screen for TasksScreen {
                         }
                     }
                     self.reload();
-                    // self.mode = TasksMode::View;
+                    self.mode = TasksMode::View;
                     None
                 }
                 KeyCode::Esc | KeyCode::Char('n') => {

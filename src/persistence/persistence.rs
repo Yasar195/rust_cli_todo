@@ -17,7 +17,7 @@ impl Persistence {
         if let Some(conn) = &self.connection {
             conn.execute(
                 "CREATE TABLE IF NOT EXISTS tasks (
-                    id BIGINT PRIMARY KEY,
+                    id INTEGER PRIMARY KEY,
                     title TEXT NOT NULL,
                     description TEXT,
                     completed BOOLEAN NOT NULL
@@ -82,6 +82,7 @@ pub trait Persistable: Sized {
     fn describe(&self) -> String;
 }
 
+#[derive(Debug)]
 pub struct Task {
     pub id: Option<i64>,
     pub title: String,
