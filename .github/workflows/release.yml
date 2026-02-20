@@ -14,24 +14,24 @@ jobs:
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            artifact_name: my-app
-            asset_name: my-app-linux-amd64
+            artifact_name: todo
+            asset_name: todo-linux-amd64
           - os: ubuntu-latest
             target: x86_64-unknown-linux-musl
-            artifact_name: my-app
-            asset_name: my-app-linux-musl-amd64
+            artifact_name: todo
+            asset_name: todo-linux-musl-amd64
           - os: macos-latest
             target: x86_64-apple-darwin
-            artifact_name: my-app
-            asset_name: my-app-macos-amd64
+            artifact_name: todo
+            asset_name: todo-macos-amd64
           - os: macos-latest
             target: aarch64-apple-darwin
-            artifact_name: my-app
-            asset_name: my-app-macos-arm64
+            artifact_name: todo
+            asset_name: todo-macos-arm64
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            artifact_name: my-app.exe
-            asset_name: my-app-windows-amd64.exe
+            artifact_name: todo.exe
+            asset_name: todo-windows-amd64.exe
 
     runs-on: ${{ matrix.os }}
     
