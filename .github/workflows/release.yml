@@ -38,6 +38,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      - name: Install musl tools (Linux musl)
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+      
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -49,3 +55,21 @@ jobs:
       - name: Package (Unix)
         if: matrix.os != 'windows-latest'
         run: |
+          cd target/${{ matrix.target }}/release
+          tar czf ${{ matrix.asset_name }}.tar.gz ${{ matrix.artifact_name }}
+          mv ${{ matrix.asset_name }}.tar.gz ../../..
+          
+      - name: Package (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          cd target/${{ matrix.target }}/release
+          7z a ${{ matrix.asset_name }}.zip ${{ matrix.artifact_name }}
+          move ${{ matrix.asset_name }}.zip ..\..\..
+          
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_name }}
+          path: |
+            ${{ matrix.asset_name }}.tar.gz
+            ${{ matrix.asset_name }}.zip
