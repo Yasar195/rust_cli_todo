@@ -7,6 +7,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:
@@ -80,15 +83,36 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     
     steps:
+      - uses: actions/checkout@v4
+      
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
           
+      - name: Create version manifest
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          cat > version.json << EOF
+          {
+            "version": "$VERSION",
+            "release_date": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "downloads": {
+              "linux-amd64": "https://github.com/${{ github.repository }}/releases/download/$VERSION/todo-linux-amd64.tar.gz",
+              "linux-musl-amd64": "https://github.com/${{ github.repository }}/releases/download/$VERSION/todo-linux-musl-amd64.tar.gz",
+              "macos-amd64": "https://github.com/${{ github.repository }}/releases/download/$VERSION/todo-macos-amd64.tar.gz",
+              "macos-arm64": "https://github.com/${{ github.repository }}/releases/download/$VERSION/todo-macos-arm64.tar.gz",
+              "windows-amd64": "https://github.com/${{ github.repository }}/releases/download/$VERSION/todo-windows-amd64.exe.zip"
+            }
+          }
+          EOF
+          
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: artifacts/**/*
+          files: |
+            artifacts/**/*
+            version.json
           draft: false
           prerelease: false
         env:
