@@ -1,32 +1,86 @@
+use crate::screens::settings::SettingsScreen;
+use crate::screens::tasks::TasksScreen;
 use crate::ui::navigation::NavigatableList;
 use crate::ui::screen::{Screen, ScreenAction};
-use crossterm::event::{KeyEvent, KeyCode, Event};
-use ratatui::Frame;
+use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::layout::Rect;
+use ratatui::style::{Color, Modifier, Style};
+use ratatui::widgets::{Block, Borders, List, ListItem};
+use ratatui::Frame;
 
 pub struct MenuScreen {
-    list: NavigatableList
+    pub title: String,
+    pub list: NavigatableList,
+}
+
+impl MenuScreen {
+    pub fn new() -> Self {
+        let mut list = NavigatableList {
+            state: ratatui::widgets::ListState::default(),
+            options: vec![
+                "View Tasks".to_string(),
+                "Add Task".to_string(),
+                "Settings".to_string(),
+                "Exit".to_string(),
+            ],
+        };
+        list.state.select(Some(0));
+
+        MenuScreen {
+            title: "Main Menu".to_string(),
+            list,
+        }
+    }
 }
 
 impl Screen for MenuScreen {
     fn handle_input(&mut self, key: KeyEvent) -> Option<ScreenAction> {
         match key.code {
-            KeyCode::Down => self.list.next(),
-            KeyCode::Up => self.list.previous(),
+            KeyCode::Down => {
+                self.list.next();
+                None
+            }
+            KeyCode::Up => {
+                self.list.previous();
+                None
+            }
             KeyCode::Enter => {
                 let selected = self.list.state.selected().unwrap_or(0);
-                println!("Selected: {}", self.list.options[selected]);
+                match self.list.options[selected].as_str() {
+                    "View Tasks" | "Add Task" => Some(ScreenAction::Switch(Box::new(TasksScreen::new()))),
+                    "Settings" => Some(ScreenAction::Switch(Box::new(SettingsScreen::new()))),
+                    "Exit" => Some(ScreenAction::Exit),
+                    _ => None,
+                }
             }
-            _ => {}
-        }   
+            KeyCode::Char('q') => Some(ScreenAction::Exit),
+            _ => None,
+        }
     }
 
     fn render(&mut self, frame: &mut Frame, area: Rect) {
-        let items: Vec<ratatui::widgets::ListItem> = self.list.options.iter().map(|t| ratatui::widgets::ListItem::new(t.as_str())).collect();
-        let list = ratatui::widgets::List::new(items)
-            .block(ratatui::widgets::Block::default().title(self.screen_name.as_str()).borders(ratatui::widgets::Borders::ALL))
-            .highlight_style(ratatui::style::Style::default().bg(ratatui::style::Color::Blue).fg(ratatui::style::Color::White))
+        let items: Vec<ListItem> = self
+            .list
+            .options
+            .iter()
+            .map(|label| ListItem::new(format!("  {}", label)))
+            .collect();
+
+        let list = List::new(items)
+            .block(
+                Block::default()
+                    .title(format!(" {} ", self.title))
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(Color::Cyan)),
+            )
+            .highlight_style(
+                Style::default()
+                    .bg(Color::Blue)
+                    .fg(Color::White)
+                    .add_modifier(Modifier::BOLD),
+            )
             .highlight_symbol(">> ");
+
         frame.render_stateful_widget(list, area, &mut self.list.state);
     }
 }

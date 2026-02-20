@@ -30,7 +30,7 @@ impl Persistence {
     fn create_database() {
         let file: Result<File, std::io::Error> = File::open("tasks.db");
         match file {
-            Ok(_) => println!("Database already exists."),
+            Ok(_) => (),
             Err(_) => {
                 match File::create("tasks.db") {
                     Ok(_) => (),
@@ -62,14 +62,22 @@ impl Persistence {
         items
     }
 
-    
+    pub fn delete<T: Persistable>(&self, id: i64) {
+        if let Some(conn) = &self.connection {
+            conn.execute(T::delete_sql().as_str(), [id])
+                .expect("Failed to delete item");
+        }
+    }
+
 }
+
 
 
 pub trait Persistable: Sized {
     fn insert_sql(&self) -> String;
     fn params(&self) -> Vec<&dyn rusqlite::ToSql>;
     fn get_all_sql() -> String;
+    fn delete_sql() -> String;
     fn from_row(row: &rusqlite::Row) -> rusqlite::Result<Self>;
     fn describe(&self) -> String;
 }
@@ -92,6 +100,10 @@ impl Persistable for Task {
 
     fn get_all_sql() -> String {
         "SELECT id, title, description, completed FROM tasks".to_string()
+    }
+
+    fn delete_sql() -> String {
+        "DELETE FROM tasks WHERE id = ?1".to_string()
     }
 
     fn from_row(row: &rusqlite::Row) -> rusqlite::Result<Self> {
