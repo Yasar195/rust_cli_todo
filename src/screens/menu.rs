@@ -78,7 +78,7 @@ impl Screen for MenuScreen {
                     .fg(Color::White)
                     .add_modifier(Modifier::BOLD),
             )
-            .highlight_symbol(">> ");
+            .highlight_symbol(">>");
 
         frame.render_stateful_widget(list, area, &mut self.list.state);
     }

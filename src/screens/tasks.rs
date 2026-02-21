@@ -241,7 +241,7 @@ impl Screen for TasksScreen {
                     .fg(Color::White)
                     .add_modifier(Modifier::BOLD),
             )
-            .highlight_symbol(">> ");
+            .highlight_symbol(">>");
 
         frame.render_stateful_widget(list, horizontal[0], &mut self.state);
 
