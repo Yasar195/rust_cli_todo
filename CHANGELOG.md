@@ -1,6 +1,12 @@
 # Changelog
 
-## [0.2.4] - 2026-02-21
+## [0.2.6] - 2026-02-21
+
+### Fixed
+- Critical database initialization bug.
+
+
+## [0.2.5] - 2026-02-21
 
 ### Patched
 - Task list is now ordered as last in first out fashion
