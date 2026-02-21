@@ -10,11 +10,11 @@ rand = "0.9.2"
 ratatui = "0.30.0"
 rusqlite = { version = "0.38.0", features = ["bundled"] }
 rmcp = { version = "0.1", features = ["server", "transport-sse"] }
-reqwest = { version = "0.12", features = ["blocking", "json"] }
+reqwest = { version = "0.12", features = ["blocking", "json", "rustls-tls"], default-features = false }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 semver = "1.0"
-self_update = { version = "0.41", features = ["archive-tar", "archive-zip", "compression-flate2", "compression-zip-deflate"] }
+self_update = { version = "0.41", default-features = false, features = ["archive-tar", "archive-zip", "compression-flate2", "compression-zip-deflate", "rustls"] }
 
 [target.'cfg(unix)'.dependencies]
 flate2 = "1.0"
