@@ -62,6 +62,15 @@ impl Persistence {
         items
     }
 
+    pub fn update<T: Persistable>(&self, item: &T) {
+        if let Some(conn) = &self.connection {
+            conn.execute(
+                T::update_sql().as_str(),
+                item.update_params().as_slice()
+            ).expect("Failed to update item");
+        }
+    }
+
     pub fn delete<T: Persistable>(&self, id: i64) {
         if let Some(conn) = &self.connection {
             conn.execute(T::delete_sql().as_str(), [id])
@@ -76,6 +85,8 @@ impl Persistence {
 pub trait Persistable: Sized {
     fn insert_sql(&self) -> String;
     fn params(&self) -> Vec<&dyn rusqlite::ToSql>;
+    fn update_sql() -> String;
+    fn update_params(&self) -> Vec<&dyn rusqlite::ToSql>;
     fn get_all_sql() -> String;
     fn delete_sql() -> String;
     fn from_row(row: &rusqlite::Row) -> rusqlite::Result<Self>;
@@ -96,6 +107,14 @@ impl Persistable for Task {
 
     fn params(&self) -> Vec<&dyn rusqlite::ToSql> {
         vec![&self.title, &self.description, &self.completed]
+    }
+
+    fn update_sql() -> String {
+        "UPDATE tasks SET title = ?1, description = ?2, completed = ?3 WHERE id = ?4".to_string()
+    }
+
+    fn update_params(&self) -> Vec<&dyn rusqlite::ToSql> {
+        vec![&self.title, &self.description, &self.completed, &self.id]
     }
 
     fn get_all_sql() -> String {
