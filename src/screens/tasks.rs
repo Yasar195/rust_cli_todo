@@ -229,7 +229,7 @@ impl Screen for TasksScreen {
                 .iter()
                 .map(|t| {
                     let (icon, style) = if t.completed {
-                        ("✓", Style::default().fg(Color::DarkGray).add_modifier(Modifier::CROSSED_OUT))
+                        ("✓", Style::default().fg(Color::DarkGray))
                     } else {
                         ("○", Style::default().fg(Color::White))
                     };
