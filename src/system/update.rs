@@ -83,6 +83,7 @@ pub fn perform_update() -> Result<(), Box<dyn Error>> {
         .repo_owner("Yasar195")
         .repo_name("rust_cli_todo")
         .bin_name("todo")
+        .target(get_platform_identifier())
         .current_version(VERSION)
         .build()?
         .update()?;
