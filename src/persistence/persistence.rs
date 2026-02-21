@@ -118,7 +118,7 @@ impl Persistable for Task {
     }
 
     fn get_all_sql() -> String {
-        "SELECT id, title, description, completed FROM tasks".to_string()
+        "SELECT id, title, description, completed FROM tasks ORDER BY id DESC".to_string()
     }
 
     fn delete_sql() -> String {
