@@ -101,6 +101,19 @@ impl Screen for TasksScreen {
             TasksMode::View => match key.code {
                 KeyCode::Up => { self.list_prev(); None }
                 KeyCode::Down => { self.list_next(); None }
+                KeyCode::Char(' ') | KeyCode::Enter => {
+                    if let Some(task) = self.selected_task() {
+                        let updated_task = Task {
+                            id: task.id,
+                            title: task.title.clone(),
+                            description: task.description.clone(),
+                            completed: !task.completed,
+                        };
+                        self.persistence.update(&updated_task);
+                        self.reload();
+                    }
+                    None
+                }
                 KeyCode::Char('a') => {
                     self.mode = TasksMode::Adding {
                         active_field: AddField::Title,
@@ -342,7 +355,7 @@ impl Screen for TasksScreen {
         // ── Bottom: status / hint bar ────────────────────────────────
         let (status_text, status_color) = match &self.mode {
             TasksMode::View => (
-                "  ↑↓ navigate   a → add   d → delete   q/Esc → back".to_string(),
+                "  ↑↓ navigate   Space/Enter → toggle   a → add   d → delete   q/Esc → back".to_string(),
                 Color::Green,
             ),
             TasksMode::Adding { .. } => (
