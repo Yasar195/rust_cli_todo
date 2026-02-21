@@ -9,5 +9,6 @@ pub trait Screen {
 
 pub enum ScreenAction {
     Switch(Box<dyn Screen>),
-    Exit
+    UpdateAndExit,
+    Exit,
 }

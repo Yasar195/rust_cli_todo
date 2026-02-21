@@ -79,7 +79,6 @@ pub trait Persistable: Sized {
     fn get_all_sql() -> String;
     fn delete_sql() -> String;
     fn from_row(row: &rusqlite::Row) -> rusqlite::Result<Self>;
-    fn describe(&self) -> String;
 }
 
 #[derive(Debug)]
@@ -114,14 +113,5 @@ impl Persistable for Task {
             description: row.get(2)?,
             completed: row.get(3)?,
         })
-    }
-
-    fn describe(&self) -> String {
-        format!("ID: {}, Title: {}, Description: {:?}, Completed: {}",
-            self.id.unwrap_or(0),
-            self.title,
-            self.description.as_deref().unwrap_or("no description"),
-            self.completed 
-        )
     }
 }

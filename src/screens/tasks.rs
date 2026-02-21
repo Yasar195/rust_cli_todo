@@ -1,4 +1,4 @@
-use crate::persistence::persistence::{Persistence, Persistable, Task};
+use crate::persistence::persistence::{Persistence, Task};
 use crate::ui::screen::{Screen, ScreenAction};
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
