@@ -154,7 +154,7 @@ impl Screen for SettingsScreen {
                     .fg(Color::White)
                     .add_modifier(Modifier::BOLD),
             )
-            .highlight_symbol(">> ");
+            .highlight_symbol(">>");
 
         frame.render_stateful_widget(list, chunks[0], &mut self.list.state);
 
