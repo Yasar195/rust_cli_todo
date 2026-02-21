@@ -1,4 +1,4 @@
-use std::{fs::File};
+use std::{fs::File, path::PathBuf, env};
 use rusqlite::{ Connection };
 pub struct Persistence {
     pub connection: Option<Connection>,
@@ -27,12 +27,20 @@ impl Persistence {
         }
     }
 
+    fn get_database_path() -> PathBuf {
+        let exe_path = env::current_exe().expect("Failed to get executable path");
+        let exe_dir = exe_path.parent().expect("Failed to get executable directory");
+        
+        exe_dir.join("tasks.db")
+    }
+
     fn create_database() {
-        let file: Result<File, std::io::Error> = File::open("tasks.db");
+        let db_path = Self::get_database_path();
+        let file: Result<File, std::io::Error> = File::open(&db_path);
         match file {
             Ok(_) => (),
             Err(_) => {
-                match File::create("tasks.db") {
+                match File::create(&db_path) {
                     Ok(_) => (),
                     Err(e) => eprintln!("Failed to create database: {}", e),
                 }
