@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.7] - 2026-02-21
+### Fixed
+- Critical database initialization bug.
+- UI Overlap issue fixed.
+
 ## [0.2.6] - 2026-02-21
 
 ### Fixed

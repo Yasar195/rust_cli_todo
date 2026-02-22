@@ -70,7 +70,8 @@ impl Screen for MenuScreen {
                 Block::default()
                     .title(format!(" {} ", self.title))
                     .borders(Borders::ALL)
-                    .border_style(Style::default().fg(Color::Cyan)),
+                    .border_style(Style::default().fg(Color::Cyan))
+                    .style(Style::default().bg(Color::Black)),
             )
             .highlight_style(
                 Style::default()

@@ -27,6 +27,7 @@ fn main() -> Result<(), io::Error> {
 
     loop {
         terminal.draw(|f| {
+            f.render_widget(ratatui::widgets::Clear, f.area());
             current_screen.render(f, f.area());
         })?;
 
