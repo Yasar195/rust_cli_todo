@@ -7,9 +7,10 @@ pub struct Persistence {
 impl Persistence {
 
     pub fn new() -> Self {
+        let db_path = Self::get_database_path();
         Self::create_database();
 
-        Persistence { connection: Some(Connection::open("tasks.db").unwrap()) }
+        Persistence { connection: Some(Connection::open(&db_path).unwrap()) }
     }
 
 

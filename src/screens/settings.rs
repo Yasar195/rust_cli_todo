@@ -146,7 +146,8 @@ impl Screen for SettingsScreen {
                 Block::default()
                     .title(format!(" {} ", self.title))
                     .borders(Borders::ALL)
-                    .border_style(Style::default().fg(Color::Cyan)),
+                    .border_style(Style::default().fg(Color::Cyan))
+                    .style(Style::default().bg(Color::Black)),
             )
             .highlight_style(
                 Style::default()
@@ -177,7 +178,8 @@ impl Screen for SettingsScreen {
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .border_style(Style::default().fg(Color::DarkGray)),
+                .border_style(Style::default().fg(Color::DarkGray))
+                .style(Style::default().bg(Color::Black)),
         );
 
         frame.render_widget(status, chunks[1]);
@@ -207,7 +209,8 @@ impl Screen for SettingsScreen {
                     Block::default()
                         .title(" Update Available ")
                         .borders(Borders::ALL)
-                        .border_style(Style::default().fg(Color::Yellow)),
+                        .border_style(Style::default().fg(Color::Yellow))
+                        .style(Style::default().bg(Color::Black)),
                 );
             // Center area computation
             let popup_area = centered_rect(50, 40, area);

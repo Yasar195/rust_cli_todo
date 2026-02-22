@@ -246,7 +246,8 @@ impl Screen for TasksScreen {
                 Block::default()
                     .title(format!(" {} ({}) ", self.title, self.tasks.len()))
                     .borders(Borders::ALL)
-                    .border_style(Style::default().fg(Color::Cyan)),
+                    .border_style(Style::default().fg(Color::Cyan))
+                    .style(Style::default().bg(Color::Black)),
             )
             .highlight_style(
                 Style::default()
@@ -297,7 +298,8 @@ impl Screen for TasksScreen {
                         Block::default()
                             .title(" Details ")
                             .borders(Borders::ALL)
-                            .border_style(Style::default().fg(Color::Cyan)),
+                            .border_style(Style::default().fg(Color::Cyan))
+                            .style(Style::default().bg(Color::Black)),
                     );
                 frame.render_widget(detail, horizontal[1]);
             }
@@ -346,7 +348,8 @@ impl Screen for TasksScreen {
                         Block::default()
                             .title(" Add Task ")
                             .borders(Borders::ALL)
-                            .border_style(Style::default().fg(Color::Yellow)),
+                            .border_style(Style::default().fg(Color::Yellow))
+                            .style(Style::default().bg(Color::Black)),
                     );
                 frame.render_widget(form, horizontal[1]);
             }
@@ -369,7 +372,10 @@ impl Screen for TasksScreen {
         };
 
         let status = Paragraph::new(Line::from(Span::styled(status_text, Style::default().fg(status_color))))
-            .block(Block::default().borders(Borders::ALL).border_style(Style::default().fg(Color::DarkGray)));
+            .block(Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(Color::DarkGray))
+                .style(Style::default().bg(Color::Black)));
 
         frame.render_widget(status, vertical[1]);
     }
