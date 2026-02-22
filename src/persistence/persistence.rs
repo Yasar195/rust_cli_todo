@@ -29,10 +29,19 @@ impl Persistence {
     }
 
     fn get_database_path() -> PathBuf {
-        let exe_path = env::current_exe().expect("Failed to get executable path");
-        let exe_dir = exe_path.parent().expect("Failed to get executable directory");
+        let data_dir = if cfg!(target_os = "windows") {
+            let appdata = env::var("APPDATA").expect("Failed to get APPDATA");
+            PathBuf::from(appdata).join("todo")
+        } else {
+            let home = env::var("HOME").expect("Failed to get HOME");
+            let xdg_data = env::var("XDG_DATA_HOME")
+                .unwrap_or_else(|_| format!("{}/.local/share", home));
+            PathBuf::from(xdg_data).join("todo")
+        };
         
-        exe_dir.join("tasks.db")
+        std::fs::create_dir_all(&data_dir).expect("Failed to create data directory");
+        
+        data_dir.join("tasks.db")
     }
 
     fn create_database() {
