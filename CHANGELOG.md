@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.2.8] - 2026-02-21
+### Fixed
+- Database write permission issue
+
 ## [0.2.7] - 2026-02-21
 ### Fixed
 - Critical database initialization bug.
