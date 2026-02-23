@@ -20,6 +20,11 @@ enum TasksMode {
     },
     /// Waiting for confirmation before deleting
     ConfirmDelete,
+    Updating {
+        active_field: AddField,
+        title: String,
+        description: String
+    }
 }
 
 #[derive(PartialEq)]
@@ -114,6 +119,16 @@ impl Screen for TasksScreen {
                     }
                     None
                 }
+                KeyCode::Char('u') => {
+                    if let Some(task) = self.selected_task() {
+                        self.mode = TasksMode::Updating {
+                            active_field: AddField::Title,
+                            title: task.title.clone(),
+                            description: task.description.clone().unwrap_or_else(String::new),
+                        };
+                    }
+                    None
+                }
                 KeyCode::Char('a') => {
                     self.mode = TasksMode::Adding {
                         active_field: AddField::Title,
@@ -198,6 +213,54 @@ impl Screen for TasksScreen {
                 }
                 KeyCode::Esc | KeyCode::Char('n') => {
                     self.mode = TasksMode::View;
+                    None
+                }
+                _ => None,
+            },
+            TasksMode::Updating { active_field, title, description } => match key.code {
+                KeyCode::Esc => {
+                    self.mode = TasksMode::View;
+                    None
+                }
+                KeyCode::Tab => {
+                    *active_field = if *active_field == AddField::Title {
+                        AddField::Description
+                    } else {
+                        AddField::Title
+                    };
+                    None
+                }
+                KeyCode::Enter => {
+                    if !title.trim().is_empty() {
+                        let t = title.trim().to_string();
+                        let d = description.trim().to_string();
+                        let task = Task {
+                            id: self.selected_task().and_then(|t| t.id),
+                            title: t,
+                            description: if d.is_empty() { None } else { Some(d) },
+                            completed: self.selected_task().map(|t| t.completed).unwrap_or(false),
+                        };
+                        self.persistence.update(&task);
+                        self.reload();
+                        if !self.tasks.is_empty() {
+                            self.state.select(Some(self.tasks.len() - 1));
+                        }
+                    }
+                    self.mode = TasksMode::View;
+                    None
+                }
+                KeyCode::Backspace => {
+                    match active_field {
+                        AddField::Title => { title.pop(); }
+                        AddField::Description => { description.pop(); }
+                    }
+                    None
+                }
+                KeyCode::Char(c) => {
+                    match active_field {
+                        AddField::Title => title.push(c),
+                        AddField::Description => description.push(c),
+                    }
                     None
                 }
                 _ => None,
@@ -353,12 +416,62 @@ impl Screen for TasksScreen {
                     );
                 frame.render_widget(form, horizontal[1]);
             }
+
+            TasksMode::Updating { active_field, title, description } => {
+                let title_style = if *active_field == AddField::Title {
+                    Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD)
+                } else {
+                    Style::default().fg(Color::White)
+                };
+                let desc_style = if *active_field == AddField::Description {
+                    Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD)
+                } else {
+                    Style::default().fg(Color::White)
+                };
+
+                let form_lines = vec![
+                    Line::from(""),
+                    Line::from(Span::styled(
+                        "  Title",
+                        Style::default().fg(Color::DarkGray),
+                    )),
+                    Line::from(vec![
+                        Span::styled("  > ", Style::default().fg(Color::Cyan)),
+                        Span::styled(format!("{}_", title), title_style),
+                    ]),
+                    Line::from(""),
+                    Line::from(Span::styled(
+                        "  Description  (optional)",
+                        Style::default().fg(Color::DarkGray),
+                    )),
+                    Line::from(vec![
+                        Span::styled("  > ", Style::default().fg(Color::Cyan)),
+                        Span::styled(format!("{}_", description), desc_style),
+                    ]),
+                    Line::from(""),
+                    Line::from(""),
+                    Line::from(Span::styled(
+                        "  Tab → next field   Enter → save   Esc → cancel",
+                        Style::default().fg(Color::DarkGray),
+                    )),
+                ];
+
+                let form = Paragraph::new(form_lines)
+                    .block(
+                        Block::default()
+                            .title(" Add Task ")
+                            .borders(Borders::ALL)
+                            .border_style(Style::default().fg(Color::Yellow))
+                            .style(Style::default().bg(Color::Black)),
+                    );
+                frame.render_widget(form, horizontal[1]);
+            }
         }
 
         // ── Bottom: status / hint bar ────────────────────────────────
         let (status_text, status_color) = match &self.mode {
             TasksMode::View => (
-                "  ↑↓ navigate   Space/Enter → toggle   a → add   d → delete   q/Esc → back".to_string(),
+                "  ↑↓ navigate   Space/Enter → toggle   a → add   u → update   d → delete   q/Esc → back".to_string(),
                 Color::Green,
             ),
             TasksMode::Adding { .. } => (
@@ -367,6 +480,10 @@ impl Screen for TasksScreen {
             ),
             TasksMode::ConfirmDelete => (
                 "  ⚠  Delete this task?   Enter → confirm   Esc/n → cancel".to_string(),
+                Color::Red,
+            ),
+            TasksMode::Updating { .. } => (
+                "  Updating task   Enter → confirm   Esc/n → cancel".to_string(),
                 Color::Red,
             ),
         };
