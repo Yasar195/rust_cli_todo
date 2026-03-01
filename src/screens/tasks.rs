@@ -407,6 +407,7 @@ impl Screen for TasksScreen {
                 ];
 
                 let form = Paragraph::new(form_lines)
+                    .wrap(Wrap { trim: false })
                     .block(
                         Block::default()
                             .title(" Add Task ")

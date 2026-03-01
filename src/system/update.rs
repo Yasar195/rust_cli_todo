@@ -8,15 +8,16 @@ const UPDATE_CHECK_URL: &str = "https://github.com/Yasar195/rust_cli_todo/releas
 pub struct VersionInfo {
     pub version: String,
     pub release_date: String,
-    pub downloads: std::collections::HashMap<String, String>,
+    // pub downloads: std::collections::HashMap<String, String>,
 }
 
 #[derive(Debug)]
 pub struct UpdateInfo {
     pub current_version: String,
     pub latest_version: String,
+    pub release_date: String,
     pub update_available: bool,
-    pub download_url: Option<String>,
+    // pub download_url: Option<String>,
 }
 
 /// Check if a new version is available
@@ -28,28 +29,29 @@ pub fn check_for_updates() -> Result<UpdateInfo, Box<dyn Error>> {
     let latest_version = semver::Version::parse(version_info.version.trim_start_matches('v'))?;
     
     let update_available = latest_version > current_version;
-    let download_url = if update_available {
-        Some(get_download_url_from_info(&version_info))
-    } else {
-        None
-    };
+    // let download_url = if update_available {
+    //     Some(get_download_url_from_info(&version_info))
+    // } else {
+    //     None
+    // };
     
     Ok(UpdateInfo {
         current_version: format!("v{}", current_version),
         latest_version: version_info.version,
+        release_date: version_info.release_date,
         update_available,
-        download_url,
+        // download_url,
     })
 }
 
 /// Get the appropriate download URL for the current platform
-fn get_download_url_from_info(info: &VersionInfo) -> String {
-    let platform = get_platform_identifier();
-    info.downloads
-        .get(platform)
-        .cloned()
-        .unwrap_or_else(|| panic!("No download available for platform: {}", platform))
-}
+// fn get_download_url_from_info(info: &VersionInfo) -> String {
+//     let platform = get_platform_identifier();
+//     info.downloads
+//         .get(platform)
+//         .cloned()
+//         .unwrap_or_else(|| panic!("No download available for platform: {}", platform))
+// }
 
 /// Get platform identifier matching your release naming
 fn get_platform_identifier() -> &'static str {

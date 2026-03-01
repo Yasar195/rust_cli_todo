@@ -14,7 +14,7 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 pub enum UpdateState {
     Idle,
     Checking,
-    UpdateAvailable(String),
+    UpdateAvailable(String, String, String),
 }
 
 pub struct SettingsScreen {
@@ -22,7 +22,7 @@ pub struct SettingsScreen {
     pub list: NavigatableList,
     pub status_message: Option<String>,
     pub update_state: UpdateState,
-    update_rx: Option<Receiver<Option<String>>>,
+    update_rx: Option<Receiver<Option<(String, String, String)>>>,
 }
 
 impl SettingsScreen {
@@ -54,7 +54,7 @@ impl SettingsScreen {
 
         thread::spawn(move || {
             let result = match crate::system::update::check_for_updates() {
-                Ok(info) if info.update_available => Some(info.latest_version),
+                Ok(info) if info.update_available => Some((info.latest_version, info.release_date, info.current_version)),
                 _ => None,
             };
             let _ = tx.send(result);
@@ -65,8 +65,8 @@ impl SettingsScreen {
         if let Some(rx) = &self.update_rx {
             if let Ok(result) = rx.try_recv() {
                 self.update_rx = None; // clear the receiver
-                if let Some(latest) = result {
-                    self.update_state = UpdateState::UpdateAvailable(latest);
+                if let Some((latest, date, current)) = result {
+                    self.update_state = UpdateState::UpdateAvailable(latest, date, current);
                 } else {
                     self.update_state = UpdateState::Idle;
                     self.status_message = Some(format!(" ✓ Version {} is up to date.", VERSION));
@@ -79,7 +79,7 @@ impl SettingsScreen {
 impl Screen for SettingsScreen {
     fn handle_input(&mut self, key: KeyEvent) -> Option<ScreenAction> {
         // Intercept input if update prompt is active
-        if let UpdateState::UpdateAvailable(_) = &self.update_state {
+        if let UpdateState::UpdateAvailable(_, _, _) = &self.update_state {
             match key.code {
                 KeyCode::Char('y') | KeyCode::Char('Y') | KeyCode::Enter => {
                     return Some(ScreenAction::UpdateAndExit);
@@ -162,7 +162,7 @@ impl Screen for SettingsScreen {
         // --- Status bar ---
         let (status_text, status_color) = match &self.update_state {
             UpdateState::Checking => (" Checking for updates...".to_string(), Color::Yellow),
-            UpdateState::UpdateAvailable(_) => (" Waiting for input...".to_string(), Color::Yellow),
+            UpdateState::UpdateAvailable(_, _, _) => (" Waiting for input...".to_string(), Color::Yellow),
             UpdateState::Idle => {
                 let msg = self.status_message.clone().unwrap_or_else(|| {
                     " Press Enter on an option to select.  |  Esc / q → Back".to_string()
@@ -185,13 +185,21 @@ impl Screen for SettingsScreen {
         frame.render_widget(status, chunks[1]);
         
         // --- Overlay Popup ---
-        if let UpdateState::UpdateAvailable(latest) = &self.update_state {
+        if let UpdateState::UpdateAvailable(latest, release_date, current_version) = &self.update_state {
             let prompt_text = vec![
                 Line::from(""),
                 Line::from(vec![
                     Span::raw("A new version ("),
                     Span::styled(latest.clone(), Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD)),
                     Span::raw(") is available!"),
+                ]),
+                Line::from(vec![
+                    Span::styled("Current version: ", Style::default().fg(Color::DarkGray)),
+                    Span::styled(current_version.clone(), Style::default().fg(Color::Yellow)),
+                ]),
+                Line::from(vec![
+                    Span::styled("Released: ", Style::default().fg(Color::DarkGray)),
+                    Span::styled(release_date.clone(), Style::default().fg(Color::Yellow)),
                 ]),
                 Line::from(""),
                 Line::from(Span::styled("Would you like to install it now?", Style::default().fg(Color::DarkGray))),
