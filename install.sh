@@ -3,7 +3,7 @@ set -e
 
 # ─────────────────────────────────────────────
 #  todo — installer
-#  Usage:  curl -fsSL https://raw.githubusercontent.com/YOUR_USER/YOUR_REPO/releases/install.sh | sh
+#  Usage:  curl -fsSL https://raw.githubusercontent.com/Yasar195/rust_cli_todo/release/install.sh | sh
 #          curl -fsSL ... | sh -s -- --version v1.2.3
 #          curl -fsSL ... | sh -s -- --install-dir ~/.local/bin
 # ─────────────────────────────────────────────
