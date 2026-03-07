@@ -7,8 +7,6 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, List, ListItem, ListState, Paragraph, Wrap};
 use ratatui::Frame;
 
-// ── Mode state machine ────────────────────────────────────────────────────────
-
 enum TasksMode {
     /// Normal view: navigate list, see details
     View,
